@@ -1,0 +1,48 @@
+# 核心框架
+langchain>=0.1.0
+langchain-community>=0.0.20
+langchain-core>=0.1.0
+langsmith>=0.0.80
+
+# 语言模型
+openai>=1.0.0
+langchain-openai>=0.0.5
+
+# 向量数据库和检索
+chromadb>=0.4.0
+faiss-cpu>=1.7.4
+langchain-chroma>=0.1.0
+
+# 外部API工具
+tavily-python>=0.3.0
+requests>=2.31.0
+
+# 数据处理
+numpy>=1.24.0
+pandas>=2.0.0
+
+# 文档处理
+langchain-text-splitters>=0.0.1
+python-docx>=0.8.11
+PyPDF2>=3.0.0
+
+# 环境配置
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# 测试
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# 开发工具
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+
+# 日志和监控
+loguru>=0.7.0
+
+# 异步支持
+aiohttp>=3.8.0
+aiofiles>=23.0.0
