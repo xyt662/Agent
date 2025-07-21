@@ -3,7 +3,7 @@
 """
 
 from langchain.chat_models import init_chat_model
-from src.rag_agent.core.config import get_deepseek_api_key
+from rag_agent.core.config import get_deepseek_api_key
 
 
 def get_llm():

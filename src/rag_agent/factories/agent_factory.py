@@ -13,11 +13,11 @@ from langchain_core.tools import BaseTool
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
-from src.rag_agent.core.agent_state import AgentState
-from src.rag_agent.nodes.agent_node import agent_node
-from src.rag_agent.nodes.tool_node import tool_node
-from src.rag_agent.core.llm_provider import get_llm
-from src.rag_agent.tools.tool_registry import get_all_tools
+from rag_agent.core.agent_state import AgentState
+from rag_agent.nodes.agent_node import agent_node
+from rag_agent.nodes.tool_node import tool_node
+from rag_agent.core.llm_provider import get_llm
+from rag_agent.tools.tool_registry import get_all_tools
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
