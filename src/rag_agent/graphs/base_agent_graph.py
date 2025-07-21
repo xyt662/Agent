@@ -123,41 +123,4 @@ def create_modern_agent_graph():
         return create_agent_graph()
     except Exception as e:
         logging.error(f"创建Agent失败: {e}")
-        raise
-
-
-# 主程序入口
-if __name__ == "__main__":
-    from langchain_core.messages import HumanMessage
-    import logging
-
-    # 配置日志
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
-    try:
-        # 优先使用工厂方法创建Agent
-        from rag_agent.factories.agent_factory import get_main_agent_runnable
-
-        app = get_main_agent_runnable()
-        logger.info("使用工厂方法成功创建Agent")
-    except Exception as e:
-        logger.warning(f"工厂方法创建Agent失败: {e}，回退到本地方法")
-        # 回退到本地create_agent_graph方法
-        app = create_agent_graph()
-        if app is None:
-            logger.error("Agent创建失败,程序退出")
-            exit(1)
-
-    # 修正输入格式
-    inputs = {"messages": [HumanMessage(content="你好,请使用你的工具回答'测试'")]}
-
-    try:
-        logger.info("开始执行Agent流程")
-        for s in app.stream(inputs, stream_mode="values"):
-            print("--- 流输出 ---")
-            print(s)
-            print("-" * 40)
-        logger.info("Agent流程执行完成")
-    except Exception as e:
-        logger.error(f"Agent执行失败: {e}", exc_info=True)
+        raise e
