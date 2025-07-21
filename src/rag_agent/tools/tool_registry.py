@@ -19,7 +19,7 @@ def register_tool(tool_func: BaseTool):
     logger.info(f"工具 {tool_func.name} 注册成功")
 
 
-def get_registered_tools() -> List[BaseTool]:
+def get_all_tools() -> List[BaseTool]:
     """获取所有注册的工具"""
     return _TOOL_REGISTRY.copy()
 
@@ -40,8 +40,3 @@ def fake_tool(query: str) -> str:
 
 # 自动注册默认工具
 register_tool(fake_tool)
-
-
-def get_all_tools() -> List[BaseTool]:
-    """获取所有注册的工具"""
-    return get_registered_tools()
