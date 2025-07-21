@@ -3,7 +3,7 @@ from langchain_core.messages import AIMessage
 from langchain.agents.format_scratchpad.openai_tools import (
     format_to_openai_tool_messages,
 )
-from src.rag_agent.core.agent_state import AgentState
+from rag_agent.core.agent_state import AgentState
 
 
 def agent_node(state: AgentState, llm_with_tools):
