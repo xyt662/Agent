@@ -1,5 +1,5 @@
 from langgraph.prebuilt import ToolNode
-from src.rag_agent.core.agent_state import AgentState
+from rag_agent.core.agent_state import AgentState
 
 
 def tool_node(state: AgentState, tool_executor: ToolNode):

@@ -5,10 +5,10 @@ from langchain.chat_models import init_chat_model
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
-from src.rag_agent.core.agent_state import AgentState
-from src.rag_agent.core.config import get_deepseek_api_key, LLM_MODEL_NAME
-from src.rag_agent.nodes.agent_node import agent_node
-from src.rag_agent.nodes.tool_node import tool_node
+from rag_agent.core.agent_state import AgentState
+from rag_agent.core.config import get_deepseek_api_key, LLM_MODEL_NAME
+from rag_agent.nodes.agent_node import agent_node
+from rag_agent.nodes.tool_node import tool_node
 
 # --- 1. 定义一个伪工具用于测试 ---
 # 在任务1.2中，我们会用真实的知识库工具替换它
@@ -72,7 +72,7 @@ def create_agent_graph():
 
     try:
         # 使用工厂方法创建Agent，保持向后兼容
-        from src.rag_agent.factories.agent_factory import AgentBuilder
+        from rag_agent.factories.agent_factory import AgentBuilder
 
         builder = AgentBuilder(llm=llm, tools=tools)
         app = builder.build()
@@ -115,7 +115,7 @@ def create_modern_agent_graph():
     这是create_agent_graph()的现代化替代方案
     """
     try:
-        from src.rag_agent.factories.agent_factory import get_main_agent_runnable
+        from rag_agent.factories.agent_factory import get_main_agent_runnable
 
         return get_main_agent_runnable()
     except ImportError as e:
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     try:
         # 优先使用工厂方法创建Agent
-        from src.rag_agent.factories.agent_factory import get_main_agent_runnable
+        from rag_agent.factories.agent_factory import get_main_agent_runnable
 
         app = get_main_agent_runnable()
         logger.info("使用工厂方法成功创建Agent")
