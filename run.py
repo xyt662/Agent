@@ -18,7 +18,7 @@ if str(src_path) not in sys.path:
 
 # 现在可以正常导入模块了
 if __name__ == "__main__":
-    from rag_agent.graphs.base_agent_graph import create_agent_graph
+    from rag_agent.factories.agent_factory import get_main_agent_runnable
     from langchain_core.messages import HumanMessage
     import logging
     
@@ -26,8 +26,8 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
     
     try:
-        # 使用create_agent_graph创建Agent（现在它内部调用了工厂方法）
-        app = create_agent_graph()
+        # 使用工厂方法创建Agent
+        app = get_main_agent_runnable()
         logger.info("成功创建Agent")
         if app is None:
             logger.error("Agent创建失败,程序退出")
@@ -37,7 +37,8 @@ if __name__ == "__main__":
         exit(1)
     
     # 测试Agent
-    inputs = {"messages": [HumanMessage(content="你好,请使用你的工具回答'测试'")]}
+    # 使用一个需要背景知识的问题来测试RAG功能
+    inputs = {"messages": [HumanMessage(content="LangGraph的核心优势是什么？请详细介绍一下。")]}
     
     try:
         logger.info("开始执行Agent流程")
