@@ -5,7 +5,7 @@
 import logging
 from typing import List
 from langchain_core.tools import BaseTool
-from langchain.tools import tool
+from langchain_core.tools import tool
 
 logger = logging.getLogger(__name__)
 
