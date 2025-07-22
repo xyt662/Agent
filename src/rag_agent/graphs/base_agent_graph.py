@@ -1,126 +1,71 @@
+# 文件: src/rag_agent/graphs/base_agent_graph.py
+
 import logging
-from functools import partial
-from langchain_core.agents import AgentFinish
-from langchain.chat_models import init_chat_model
+from typing import List
+from langchain_core.language_models import BaseChatModel
+from langchain_core.tools import BaseTool
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
 from rag_agent.core.agent_state import AgentState
-from rag_agent.core.config import get_deepseek_api_key, LLM_MODEL_NAME
 from rag_agent.nodes.agent_node import agent_node
-from rag_agent.nodes.tool_node import tool_node
 
-# --- 1. 定义一个伪工具用于测试 ---
-# 在任务1.2中，我们会用真实的知识库工具替换它
-from langchain.tools import tool
+logger = logging.getLogger(__name__)
 
-
-@tool
-def fake_tool(query: str) -> str:
-    """这是一个用于测试的伪工具，它总是返回一个固定的字符串。"""
-    print(f"伪工具被调用，查询: {query}")
-    return "这是一个来自伪工具的回答。"
-
-
-tools = [fake_tool]
-
-# --- 2. 初始化模型和工具执行器 ---
-# 确保 API Key 被加载
-api_key = get_deepseek_api_key()
-
-llm = init_chat_model(
-    model="deepseek-chat", model_provider="deepseek", temperature=0, api_key=api_key
-)
-llm_with_tools = llm.bind_tools(tools)
-# 使用新的 ToolNode 替代 ToolExecutor
-tool_node_executor = ToolNode(tools)
-
-# --- 3. 将节点函数与参数绑定 ---
-# 使用 partial 来预先填充 agent 和 tool_executor 参数，使节点函数符合 LangGraph 的期望签名
-agent_node_with_tools = partial(agent_node, agent=None, llm_with_tools=llm_with_tools)
-# ToolNode 可以直接作为节点使用，不需要包装
-# tool_node_with_executor = partial(tool_node, tool_executor=tool_executor)
-
-
-# --- 4. 定义图的路由逻辑 (条件边) ---
 def should_continue(state: AgentState) -> str:
+    """路由逻辑：检查最新的消息是否包含工具调用"""
+    if state['messages'][-1].tool_calls:
+        return "action"
+    return "end"
+
+class BaseAgentGraphBuilder:
     """
-    决定流程走向的条件边
+    一个负责定义基础 ReAct Agent 图“结构”的构建器
+    它不关心具体的LLM和工具,只定义流程
     """
-    print("--- 路由判断 ---")
-    if isinstance(state["agent_outcome"], AgentFinish):
-        print("决策：结束")
-        return "end"
-    else:
-        print("决策：继续调用工具")
-        return "continue"
+    def __init__(self):
+        self.graph = StateGraph(AgentState)
+        self._setup_nodes()
+        self._setup_edges()
 
+    def _setup_nodes(self):
+        """定义图中的所有节点，但不绑定具体实现"""
+        # 节点定义是占位符，等待被注入具体逻辑
+        self.graph.add_node("agent", self.agent_node_wrapper)
+        self.graph.add_node("action", self.tool_node_wrapper)
 
-# --- 5. 定义并编译图 ---
-def create_agent_graph():
-    """
-    创建并编译 Agent 的状态图
-    已弃用：建议使用 agent_factory.get_main_agent_runnable() 替代
-    """
-    import warnings
+    def _setup_edges(self):
+        """定义图的流程和边"""
+        self.graph.set_entry_point("agent")
+        self.graph.add_conditional_edges("agent", should_continue, {"action": "action", "end": END})
+        self.graph.add_edge("action", "agent")
 
-    warnings.warn(
-        "create_agent_graph() 已弃用，请使用 agent_factory.get_main_agent_runnable()",
-        DeprecationWarning,
-        stacklevel=2,
-    )
+    def build(self, llm: BaseChatModel, tools: List[BaseTool]):
+        """
+        接收具体的“零件”(LLM和工具),完成图的最终组装和编译。
+        """
+        # 1. 绑定LLM和工具
+        llm_with_tools = llm.bind_tools(tools)
+        tool_node_executor = ToolNode(tools)
 
-    try:
-        # 使用工厂方法创建Agent，保持向后兼容
-        from rag_agent.factories.agent_factory import AgentBuilder
+        # 2. 定义节点运行时的具体逻辑
+        def agent_node_wrapper(state):
+            # 将外部注入的 llm_with_tools 传递给节点函数
+            return agent_node(state, llm_with_tools)
 
-        builder = AgentBuilder(llm=llm, tools=tools)
-        app = builder.build()
-        print("Agent 图编译完成")
-        return app
-    except Exception as e:
-        print(f"Agent 图创建失败: {e}")
-        # 回退到原始实现
-        graph = StateGraph(AgentState)
+        def tool_node_wrapper(state):
+            # ToolNode 是一个类，它需要被调用来处理状态
+            return tool_node_executor.invoke(state)
 
-        # 添加节点
-        graph.add_node("agent", agent_node_with_tools)
-        graph.add_node("action", tool_node_executor)
+        # 3. 将具体逻辑绑定到图中
+        # 注意：这里的 self.agent_node_wrapper 和 self.tool_node_wrapper 
+        # 是在 build 方法内部动态定义的，这确保了它们可以访问到 llm 和 tools
+        self.agent_node_wrapper = agent_node_wrapper
+        self.tool_node_wrapper = tool_node_wrapper
+        
+        # 重新设置节点以确保它们使用了新的包装器
+        self.graph.add_node("agent", self.agent_node_wrapper)
+        self.graph.add_node("action", self.tool_node_wrapper)
 
-        # 设置入口点
-        graph.set_entry_point("agent")
-
-        # 添加条件边
-        graph.add_conditional_edges(
-            "agent",
-            should_continue,
-            {
-                "continue": "action",
-                "end": END,
-            },
-        )
-
-        # 添加普通边
-        graph.add_edge("action", "agent")
-
-        # 编译图
-        app = graph.compile()
-        print("Agent 图编译完成（回退模式）")
-        return app
-
-
-def create_modern_agent_graph():
-    """
-    推荐的Agent创建方法,使用工厂模式
-    这是create_agent_graph()的现代化替代方案
-    """
-    try:
-        from rag_agent.factories.agent_factory import get_main_agent_runnable
-
-        return get_main_agent_runnable()
-    except ImportError as e:
-        logging.warning(f"无法导入agent_factory: {e}，回退到传统方法")
-        return create_agent_graph()
-    except Exception as e:
-        logging.error(f"创建Agent失败: {e}")
-        raise e
+        # 4. 编译并返回最终产品
+        return self.graph.compile()
