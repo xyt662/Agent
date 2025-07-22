@@ -62,3 +62,27 @@ def get_project_root():
 DEFAULT_CHUNK_SIZE = 1000
 DEFAULT_CHUNK_OVERLAP = 200
 DEFAULT_RETRIEVAL_K = 3
+
+# RAG检索优化配置
+DEFAULT_SCORE_THRESHOLD = 0.6  # 相似度阈值
+DEFAULT_USE_MMR = False  # 是否使用MMR算法
+DEFAULT_USE_QUERY_EXPANSION = True  # 是否使用查询扩展
+DEFAULT_USE_RERANKING = True  # 是否使用重排序
+DEFAULT_MMR_FETCH_K = 20  # MMR算法获取文档数
+DEFAULT_MMR_LAMBDA = 0.5  # MMR多样性参数
+
+
+def get_retrieval_config():
+    """获取检索优化配置
+    
+    Returns:
+        dict: 包含所有检索优化参数的字典
+    """
+    return {
+        'score_threshold': float(os.getenv('RAG_SCORE_THRESHOLD', DEFAULT_SCORE_THRESHOLD)),
+        'use_mmr': os.getenv('RAG_USE_MMR', str(DEFAULT_USE_MMR)).lower() == 'true',
+        'use_query_expansion': os.getenv('RAG_USE_QUERY_EXPANSION', str(DEFAULT_USE_QUERY_EXPANSION)).lower() == 'true',
+        'use_reranking': os.getenv('RAG_USE_RERANKING', str(DEFAULT_USE_RERANKING)).lower() == 'true',
+        'mmr_fetch_k': int(os.getenv('RAG_MMR_FETCH_K', DEFAULT_MMR_FETCH_K)),
+        'mmr_lambda': float(os.getenv('RAG_MMR_LAMBDA', DEFAULT_MMR_LAMBDA))
+    }
