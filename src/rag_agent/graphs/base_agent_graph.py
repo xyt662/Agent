@@ -31,8 +31,8 @@ class BaseAgentGraphBuilder:
     def _setup_nodes(self):
         """定义图中的所有节点，但不绑定具体实现"""
         # 节点定义是占位符，等待被注入具体逻辑
-        self.graph.add_node("agent", self.agent_node_wrapper)
-        self.graph.add_node("action", self.tool_node_wrapper)
+        # 这里先不添加节点，在build方法中添加
+        pass
 
     def _setup_edges(self):
         """定义图的流程和边"""
@@ -58,14 +58,8 @@ class BaseAgentGraphBuilder:
             return tool_node_executor.invoke(state)
 
         # 3. 将具体逻辑绑定到图中
-        # 注意：这里的 self.agent_node_wrapper 和 self.tool_node_wrapper 
-        # 是在 build 方法内部动态定义的，这确保了它们可以访问到 llm 和 tools
-        self.agent_node_wrapper = agent_node_wrapper
-        self.tool_node_wrapper = tool_node_wrapper
-        
-        # 重新设置节点以确保它们使用了新的包装器
-        self.graph.add_node("agent", self.agent_node_wrapper)
-        self.graph.add_node("action", self.tool_node_wrapper)
+        self.graph.add_node("agent", agent_node_wrapper)
+        self.graph.add_node("action", tool_node_wrapper)
 
         # 4. 编译并返回最终产品
         return self.graph.compile()

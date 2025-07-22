@@ -26,8 +26,8 @@ RAG-Agent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化和
 
 - **克隆项目**:
   ```bash
-  git clone https://github.com/your-username/RAG-Agent-Project.git
-  cd RAG-Agent-Project
+  git clone https://github.com/xyt662/Agent.git
+  cd Agent
   ```
 
 - **安装依赖**:

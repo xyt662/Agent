@@ -10,15 +10,15 @@ from langgraph.prebuilt import ToolNode
 from rag_agent.core.llm_provider import get_llm
 from rag_agent.tools.tool_registry import get_all_tools
 
-# 导入图的“蓝图”
-from rag_agent.graphs.base_agent_graph import BaseAgentGraph
+# 导入图的"蓝图"
+from rag_agent.graphs.base_agent_graph import BaseAgentGraphBuilder
 
 logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def get_main_agent_runnable() -> Callable:
     """
-    工厂函数,负责组装和编译主Agent。
+    工厂函数,负责组装和编译主Agent
     职责:
     1. 获取所有必要的组件(LLM, 工具)
     2. 配置组件(绑定工具,创建ToolNode)
@@ -32,18 +32,11 @@ def get_main_agent_runnable() -> Callable:
     llm = get_llm()
     tools = get_all_tools()
 
-    # 2. 配置和准备“零件”
-    llm_with_tools = llm.bind_tools(tools)
-    tool_node = ToolNode(tools) # ToolNode 本身就是配置好的节点
+    # 2. 获取图的"蓝图"
+    graph_builder = BaseAgentGraphBuilder()
 
-    # 3. 获取图的“蓝图”
-    graph_blueprint = BaseAgentGraph()
-
-    # 4. 注入依赖并编译出最终产品
-    app = graph_blueprint.compile_app(
-        llm_with_tools=llm_with_tools,
-        tool_node=tool_node
-    )
+    # 3. 注入依赖并编译出最终产品
+    app = graph_builder.build(llm=llm, tools=tools)
     
     logger.info("Main agent compiled and cached successfully.")
     return app

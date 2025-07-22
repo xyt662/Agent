@@ -1,0 +1,19 @@
+# Core LangChain dependencies
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.20
+
+# Vector database dependencies
+chromadb>=0.4.0
+langchain-chroma>=0.1.0
+
+# Embedding model dependencies
+langchain-openai>=0.1.0
+langchain-deepseek>=0.1.0
+
+# LangGraph for agent workflows
+langgraph>=0.1.0
+
+# Other utilities
+pydantic>=2.0.0
+python-dotenv>=1.0.0
