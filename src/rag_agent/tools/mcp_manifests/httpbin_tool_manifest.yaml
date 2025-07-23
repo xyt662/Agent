@@ -1,0 +1,14 @@
+# httpbin_tool_manifest.yaml
+spec_version: 1.0
+name_for_model: "get_my_public_ip"
+description_for_model: "一个简单的工具，用于获取当前服务器的公网IP地址。可以用来测试网络连通性。"
+
+input_schema:
+  type: "object"
+  properties: {} # 这个工具不需要任何输入参数
+
+execution:
+  type: "http_request"
+  url: "https://httpbin.org/ip"
+  method: "GET"
+  parameter_mapping: {} # 无需参数映射

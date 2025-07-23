@@ -1,0 +1,18 @@
+# GitHub API示例清单文件
+# 演示Bearer Token认证的使用
+spec_version: 1.0
+name_for_model: "get_github_user_info"
+description_for_model: "获取GitHub用户信息，需要GitHub Personal Access Token认证"
+
+input_schema:
+  type: "object"
+  properties: {}  # 无需输入参数，使用固定用户名
+
+execution:
+  type: "http_request"
+  url: "https://api.github.com/users/octocat"  # 使用固定用户名作为示例
+  method: "GET"
+  parameter_mapping: {}  # 暂时不支持URL路径参数替换
+  authentication:
+    type: "bearer_token"
+    secret_env_variable: "GITHUB_TOKEN"

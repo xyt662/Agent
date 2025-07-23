@@ -6,10 +6,13 @@ import os
 import logging
 from typing import List, Dict, Callable
 from functools import lru_cache
+from pathlib import Path
 from langchain_core.tools import BaseTool
 from langchain_core.tools import tool
 
 from .knowledge_base import create_knowledge_base_tool
+from .mcp_adapter import MCPToolAdapter
+from ..core.config import get_mcp_enabled, get_mcp_manifests_dir
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +38,40 @@ def fake_tool(query: str) -> str:
     return "这是一个来自伪工具的回答。"
 
 
+def load_mcp_tools() -> List[BaseTool]:
+    """加载MCP工具
+    
+    Returns:
+        List[BaseTool]: MCP工具列表
+    """
+    mcp_tools = []
+    
+    if not get_mcp_enabled():
+        logger.info("MCP工具已禁用")
+        return mcp_tools
+    
+    manifests_dir = get_mcp_manifests_dir()
+    if not manifests_dir.exists():
+        logger.warning(f"MCP清单目录不存在: {manifests_dir}")
+        return mcp_tools
+    
+    logger.info(f"开始加载MCP工具，清单目录: {manifests_dir}")
+    
+    # 遍历清单目录中的所有YAML文件
+    for manifest_file in manifests_dir.glob("*.yaml"):
+        try:
+            logger.info(f"正在加载MCP工具清单: {manifest_file.name}")
+            adapter = MCPToolAdapter(str(manifest_file))
+            tool = adapter.to_langchain_tool()
+            mcp_tools.append(tool)
+            logger.info(f"✓ 成功注册MCP工具: {tool.name}")
+        except Exception as e:
+            logger.error(f"✗ MCP工具 {manifest_file.name} 加载失败: {e}")
+    
+    logger.info(f"MCP工具加载完成，共加载 {len(mcp_tools)} 个工具")
+    return mcp_tools
+
+
 @lru_cache(maxsize=1)
 def get_all_tools() -> List[BaseTool]:
     """获取所有可用工具
@@ -56,6 +93,10 @@ def get_all_tools() -> List[BaseTool]:
             logger.info(f"{tool_name}工具注册成功")
         except Exception as e:
             logger.warning(f"{tool_name}工具注册失败: {e}，跳过该工具")
+    
+    # 加载MCP工具
+    mcp_tools = load_mcp_tools()
+    tools.extend(mcp_tools)
     
     if not tools:
         logger.warning("所有工具都加载失败，使用备用工具")

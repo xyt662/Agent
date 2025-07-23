@@ -1,0 +1,25 @@
+# API Key认证示例清单文件
+# 演示API Key在头部的认证方式
+spec_version: 1.0
+name_for_model: "weather_api_example"
+description_for_model: "获取天气信息的API示例，使用API Key认证"
+
+input_schema:
+  type: "object"
+  properties:
+    city:
+      type: "string"
+      description: "城市名称"
+  required:
+    - city
+
+execution:
+  type: "http_request"
+  url: "https://api.openweathermap.org/data/2.5/weather"
+  method: "GET"
+  parameter_mapping:
+    city: "q"
+  authentication:
+    type: "api_key_in_header"
+    header_name: "X-API-Key"
+    secret_env_variable: "WEATHER_API_KEY"

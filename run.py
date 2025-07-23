@@ -36,7 +36,7 @@ if __name__ == "__main__":
         logger.error(f"Agent创建失败: {e}")
         exit(1)
     
-    # 测试Agent
+    print("=== 测试1: RAG知识库查询 ===")
     # 使用一个需要背景知识的问题来测试RAG功能
     inputs = {"messages": [HumanMessage(content="LangGraph的核心优势是什么？请详细介绍一下。")]}
     
@@ -49,3 +49,17 @@ if __name__ == "__main__":
         logger.info("Agent流程执行完成")
     except Exception as e:
         logger.error(f"Agent执行失败: {e}", exc_info=True)
+    
+    print("\n=== 测试2: MCP工具测试 ===")
+    # 测试MCP工具
+    mcp_inputs = {"messages": [HumanMessage(content="请帮我获取当前的公网IP地址")]}
+    
+    try:
+        logger.info("开始执行MCP工具测试")
+        for s in app.stream(mcp_inputs, stream_mode="values"):
+            print("--- MCP流输出 ---")
+            print(s)
+            print("-" * 40)
+        logger.info("MCP工具测试完成")
+    except Exception as e:
+        logger.error(f"MCP工具测试失败: {e}", exc_info=True)
