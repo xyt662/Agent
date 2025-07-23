@@ -5,7 +5,7 @@ from pathlib import Path
 
 # --- 路径设置 ---
 # 这部分和你 run.py 的逻辑一样，确保能找到 src 目录
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent.parent
 src_path = project_root / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))

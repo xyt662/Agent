@@ -86,3 +86,30 @@ def get_retrieval_config():
         'mmr_fetch_k': int(os.getenv('RAG_MMR_FETCH_K', DEFAULT_MMR_FETCH_K)),
         'mmr_lambda': float(os.getenv('RAG_MMR_LAMBDA', DEFAULT_MMR_LAMBDA))
     }
+
+
+# MCP工具配置
+def get_mcp_enabled():
+    """获取MCP工具启用状态"""
+    return os.getenv("MCP_ENABLED", "true").lower() == "true"
+
+
+def get_mcp_manifests_dir():
+    """获取MCP清单文件目录路径"""
+    default_path = get_project_root() / "src" / "rag_agent" / "tools" / "mcp_manifests"
+    return Path(os.getenv("MCP_MANIFESTS_DIR", str(default_path)))
+
+
+def get_mcp_allowed_domains():
+    """获取MCP工具允许访问的域名白名单
+    
+    Returns:
+        list: 允许访问的域名列表
+    """
+    # 默认白名单包含一些常用的安全API服务
+    default_domains = "https://httpbin.org,https://api.github.com,https://jsonplaceholder.typicode.com"
+    domains_str = os.getenv("MCP_ALLOWED_DOMAINS", default_domains)
+    
+    # 解析逗号分隔的域名列表
+    domains = [domain.strip() for domain in domains_str.split(",") if domain.strip()]
+    return domains
