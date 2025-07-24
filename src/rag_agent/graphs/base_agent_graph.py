@@ -48,14 +48,14 @@ class BaseAgentGraphBuilder:
         llm_with_tools = llm.bind_tools(tools)
         tool_node_executor = ToolNode(tools)
 
-        # 2. 定义节点运行时的具体逻辑
-        def agent_node_wrapper(state):
-            # 将外部注入的 llm_with_tools 传递给节点函数
-            return agent_node(state, llm_with_tools)
+        # 2. 定义节点运行时的具体逻辑（异步版本）
+        async def agent_node_wrapper(state):
+            # 将外部注入的 llm_with_tools 传递给异步节点函数
+            return await agent_node(state, llm_with_tools)
 
-        def tool_node_wrapper(state):
-            # ToolNode 是一个类，它需要被调用来处理状态
-            return tool_node_executor.invoke(state)
+        async def tool_node_wrapper(state):
+            # ToolNode 使用异步调用来支持异步工具
+            return await tool_node_executor.ainvoke(state)
 
         # 3. 将具体逻辑绑定到图中
         self.graph.add_node("agent", agent_node_wrapper)

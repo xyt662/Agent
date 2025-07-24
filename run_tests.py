@@ -18,7 +18,8 @@ def run_unit_tests():
         "tests/unit/test_authentication_strategies.py",
         "tests/unit/test_pydantic_schema.py",
         "tests/unit/test_ssrf_protection.py",
-        "tests/unit/test_http_error_handling.py"
+        "tests/unit/test_http_error_handling.py",
+        "tests/unit/test_tool_manager.py"
     ]
     
     for test in unit_tests:
@@ -44,7 +45,10 @@ def run_integration_tests():
     print("=" * 50)
     
     integration_tests = [
-        "tests/integration/test_auth_integration.py"
+        "tests/integration/test_auth_integration.py",
+        "tests/integration/test_http_tool_loading.py",
+        "tests/integration/test_tool_manager_integration.py",
+        "tests/integration/test_mcp_refactor.py"
     ]
     
     for test in integration_tests:
