@@ -7,19 +7,24 @@
 
 RAG-Agent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化和可扩展的检索增强生成 (Retrieval-Augmented Generation, RAG) 代理项目。它旨在作为一个健壮的框架，用于开发能够利用私有知识库和外部工具来智能回答问题的复杂代理。
 
+项目已成功实现**Cursor模式的MCP（Model Context Protocol）集成**，通过本地MCP服务器提供强大的工具调用能力，支持百度地图、Tavily搜索等多种工具包。
+
 这个项目的核心设计哲学是**关注点分离**和**依赖注入**，使得每个组件（如LLM、工具、图结构）都高度解耦，易于测试、替换和扩展。
 
 ## ✨ 项目特性
 
 - **模块化架构**: 清晰的目录结构，将图的定义、节点逻辑、工具、核心服务和工厂组装完全分离
 - **ReAct 代理**: 实现了一个基础的 "Reason-Act" (ReAct) 工作流，使代理能够思考、调用工具并根据结果进行下一步行动
-- **可扩展的工具集**: 轻松集成自定义工具，如私有知识库检索、网络搜索等。
-- **MCP工具集成**: 支持通过YAML清单文件定义和加载外部HTTP API工具，具备完整的认证和错误处理机制。
-- **可配置的工作流**: `graphs` 目录下的蓝图设计允许开发者轻松定义或修改代理的工作流程，例如实现多跳查询或自我纠错循环。
+- **Cursor模式MCP集成**: 基于MCP官方Python SDK，通过stdio与本地MCP服务器进程通信
+- **丰富的工具生态**: 支持百度地图、Tavily搜索等多种MCP工具包，可通过npm、Python等方式安装
+- **异步优先设计**: 完全异步的工具调用和生命周期管理，提供高性能的并发处理能力
+- **智能资源管理**: 自动管理MCP服务器子进程的启动、通信和清理
+- **可配置的工作流**: `graphs` 目录下的蓝图设计允许开发者轻松定义或修改代理的工作流程
 - **工程化实践**:
-    - 使用工厂模式进行依赖注入和应用组装。
-    - 通过 `.env` 文件管理敏感信息和配置。
-    - 使用 `lru_cache` 缓存编译好的代理实例，提高性能。
+    - 使用工厂模式进行依赖注入和应用组装
+    - 通过 `.env` 文件管理敏感信息和配置
+    - 使用 `lru_cache` 缓存编译好的代理实例，提高性能
+    - 完善的测试覆盖和错误处理机制
 
 ## 🚀 快速开始
 
@@ -48,10 +53,14 @@ RAG-Agent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化和
   ```
 
 - **编辑 `.env` 文件**:
-  打开 `.env` 文件，并填入您的大语言模型（例如 DeepSeek）的 API 密钥。
+  打开 `.env` 文件，并填入您的大语言模型和MCP工具的 API 密钥。
   ```
   # .env
   DEEPSEEK_API_KEY="sk-your-api-key-here"
+  
+  # MCP工具API密钥
+  BAIDU_MAP_API_KEY="your-baidu-map-api-key"
+  TAVILY_API_KEY="your-tavily-api-key"
   ```
 
 ### 3. 构建知识库 (可选)
@@ -60,30 +69,34 @@ RAG-Agent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化和
 
 ### 4. 运行代理
 
-本项目提供了一个简单的命令行运行脚本，用于快速测试代理的功能。
+本项目提供了一个简单的命令行运行脚本，用于快速测试代理的MCP工具功能。
 
 ```bash
 # 在项目根目录下运行
-python src/rag_agent/run.py
+python run.py
 ```
 
-您应该能看到类似以下的日志输出，展示了代理的完整思考和行动流程：
+您应该能看到类似以下的日志输出，展示了代理加载MCP工具并执行路线规划的完整流程：
 
 ```
-INFO:rag_agent.factories.agent_factory:Assembling and compiling the main agent...
+INFO:rag_agent.tools.tool_manager:正在加载MCP工具包: tavily_mcp
+INFO:rag_agent.tools.tool_manager:正在加载MCP工具包: baidu_map
+INFO:rag_agent.tools.tool_manager:成功注册了 14 个MCP工具
 INFO:__main__:成功创建Agent
 INFO:__main__:开始执行Agent流程
 --- 流输出 ---
-{'messages': [HumanMessage(content="你好,请介绍一下LangGraph")], 'intermediate_steps': []}
+{'messages': [HumanMessage(content="请你使用百度mcp工具搜索规划一下从上海去北京的路线")]}
 ----------------------------------------
 ---思考节点(agent_node)---
-决策:调用工具 knowledge_base
+决策:调用工具 map_geocode
 --- 流输出 ---
 ...
 ---行动节点(action)---
+调用工具: map_geocode
+--- 流输出 ---
 ...
 ---思考节点(agent_node)---
-决策:直接回答
+决策:调用工具 map_driving_route
 --- 流输出 ---
 ...
 INFO:__main__:Agent流程执行完成
@@ -95,33 +108,52 @@ INFO:__main__:Agent流程执行完成
 RAG-Agent/
 ├── src/rag_agent/        # 源代码
 │   ├── core/             # 核心共享服务 (LLM提供商, 配置, 状态定义)
-│   ├── tools/            # 所有可调用的工具 (知识库, 网络搜索, MCP工具)
+│   ├── tools/            # 所有可调用的工具 (知识库, MCP工具)
+│   │   ├── local_command_adapter.py  # 本地命令MCP适配器
+│   │   ├── tool_manager.py           # MCP工具包管理器
+│   │   └── tool_registry.py          # 工具注册表
 │   ├── graphs/           # Agent工作流的"蓝图"定义
 │   ├── nodes/            # 图中每个节点的具体业务逻辑
 │   ├── factories/        # "总装车间"，负责组装所有组件并编译成可运行应用
-│   ├── main.py           # (未来) FastAPI 服务入口，用于API部署
-│   └── run.py            # 用于开发和调试的命令行启动脚本
+│   └── main.py           # (未来) FastAPI 服务入口，用于API部署
 ├── tests/                # 测试代码
+│   ├── test_*.py         # MCP工具功能测试
 │   ├── unit/             # 单元测试
 │   └── integration/      # 集成测试
 ├── tools/scripts/        # 工具脚本
 ├── docs/                 # 文档
 ├── data/                 # 数据文件
+├── tools.config.json     # MCP工具配置文件
+├── run.py                # 命令行启动脚本
 ├── run_tests.py          # 测试运行器
 └── PROJECT_STRUCTURE.md  # 项目结构说明
 ```
 
 ## 🛠️ 如何扩展
 
-- **添加新工具**:
+- **添加新的MCP工具包**:
+  1.  在 `tools.config.json` 中添加新的MCP服务器配置：
+      ```json
+      {
+        "mcpServers": {
+          "my_tool": {
+            "command": "npx",
+            "args": ["-y", "my-mcp-package@latest"],
+            "env": {
+              "API_KEY": "${MY_API_KEY}"
+            },
+            "disabled": false
+          }
+        }
+      }
+      ```
+  2.  在 `.env` 文件中添加相应的环境变量。
+  3.  工具会自动加载并集成到代理中。
+
+- **添加传统工具**:
   1.  在 `tools/` 目录下创建一个新工具函数，并用 `@tool` 装饰器标记。
   2.  在 `tools/tool_registry.py` 的 `get_all_tools()` 函数中注册你的新工具。
   3.  工厂会自动将新工具注入代理，无需修改其他代码。
-
-- **添加MCP工具**:
-  1.  在 `tools/mcp_manifests/` 目录下创建YAML清单文件，定义API工具的参数、认证和执行方式。
-  2.  支持多种认证方式：Bearer Token、API Key、Basic Auth等。
-  3.  工具会自动加载并集成到代理中，支持完整的错误处理和SSRF防护。
 
 - **修改工作流**:
   1.  打开 `graphs/base_agent_graph.py`。

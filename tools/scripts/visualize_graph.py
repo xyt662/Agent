@@ -1,6 +1,7 @@
 # 文件: scripts/visualize_graph.py
 
 import sys
+import asyncio
 from pathlib import Path
 
 # --- 路径设置 ---
@@ -13,7 +14,7 @@ if str(src_path) not in sys.path:
 # --- 导入必要的模块 ---
 from rag_agent.factories.agent_factory import get_main_agent_runnable
 
-def main():
+async def main():
     """
     一个专门用于生成并保存 Agent 图可视化图片的脚本。
     """
@@ -22,7 +23,7 @@ def main():
     try:
         # 1. 获取已编译的 Agent 应用实例
         # get_main_agent_runnable() 内部会处理所有组件的组装和编译
-        app = get_main_agent_runnable()
+        app = await get_main_agent_runnable()
         print("   ✅ Agent 应用实例加载成功。")
 
         # 2. 从已编译的应用中获取图的图形表示
@@ -56,4 +57,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
