@@ -28,8 +28,8 @@ class ChatResponse(BaseModel):
     session_id: str
 
 # 会话管理 (MVP - 内存版)
-# 注意：这是一个简单的 MVP 实现，服务器重启后会话将丢失。
-# 生产环境应替换为 Redis 或其他持久化存储。
+# 注意：这是一个简单的 MVP 实现，服务器重启后会话将丢失
+# 生产环境应替换为 Redis 或其他持久化存储
 SESSION_STATES: Dict[str, AgentState] = {}
 
 # FastAPI 生命周期管理
