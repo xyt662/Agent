@@ -17,6 +17,13 @@ langgraph>=0.1.0
 # MCP (Model Context Protocol) dependencies
 mcp>=1.0.0
 
+# FastAPI dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+sse-starlette>=1.6.0
+
+httpx>=0.25.0
+
 # Other utilities
 pydantic>=2.0.0
 python-dotenv>=1.0.0

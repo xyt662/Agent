@@ -29,8 +29,6 @@ RAG-Agent-Project/
 ├── PROJECT_STRUCTURE.md     # 项目结构详细说明
 ├── agent_graph.png          # Agent工作流程图
 │
-├── .mcp_cache/              # MCP工具清单缓存目录 (已废弃，保留用于兼容性)
-│   └── http_remote_httpbin_tool.yaml
 │
 ├── data/                    # 存放用于构建知识库的原始静态数据源
 │   └── raw/
@@ -88,8 +86,6 @@ RAG-Agent-Project/
         │   ├── tool_registry.py     # 负责发现、注册并提供所有可用工具的列表
         │   ├── tool_manager.py      # MCP工具包管理器 (Cursor模式本地MCP服务器)
         │   ├── local_command_adapter.py  # 本地命令MCP适配器，通过stdio与本地MCP服务器通信
-        │   ├── mcp_adapter.py       # HTTP远程MCP工具适配器 (已废弃，保留用于兼容性)
-        │   ├── authentication_strategies.py  # 认证策略实现 (已废弃，保留用于兼容性)
         │   └── mcp_manifests/       # 本地MCP工具清单目录 (已废弃，保留用于兼容性)
         │       └── __init__.py
         │
@@ -129,7 +125,7 @@ RAG-Agent-Project/
   - 组装和编译：将具体的LLM和工具"注入"到图的模板中，然后调用编译方法，生成一个最终可运行的 app 实例
   - 提供产品：通过带缓存的函数（如 get_main_agent_runnable）将这个最终产品提供给外部调用者（如 main.py 或 run.py）
 
-这个模型完美地体现了依赖注入 (Dependency Injection) 和关注点分离 (Separation of Concerns) 的思想，这是非常高级和易于理解的工程实践。
+这个模型完美地体现了依赖注入 (Dependency Injection) 和关注点分离 (Separation of Concerns) 的思想，这是非常高级和易于理解的工程实践
 
 ## 🧪 测试结构
 

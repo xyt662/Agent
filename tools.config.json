@@ -6,7 +6,7 @@
       "env": {
         "WEATHER_API_KEY": "${WEATHER_API_KEY}"
       },
-      "disabled": false
+      "disabled": true
     },
     "file_manager": {
       "command": "node",

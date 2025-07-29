@@ -1,4 +1,4 @@
-from rag_agent.core.agent_state import AgentState
+from ..core.agent_state import AgentState
 
 
 async def agent_node(state: AgentState, llm_with_tools):

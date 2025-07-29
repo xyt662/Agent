@@ -15,6 +15,7 @@ import os
 import json
 import asyncio
 import logging
+import hashlib
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass
@@ -305,6 +306,24 @@ class ToolPackageManager:
         """列出所有已启用工具名称"""
         return [package.name for package in self.packages if package.enabled]
     
+    def get_tools_signature(self) -> str:
+        """基于已启用的工具包生成唯一签名
+        
+        该签名用作Agent缓存的key，确保相同工具配置使用相同的Agent实例
+        
+        Returns:
+            str: 工具配置的哈希签名
+        """
+        enabled_packages = [pkg.name for pkg in self.packages if pkg.enabled]
+        if not enabled_packages:
+            return "no_tools"
+        
+        # 排序确保签名稳定性
+        signature_string = ",".join(sorted(enabled_packages))
+        
+        # 使用sha256生成哈希，取前16位确保key简洁
+        return hashlib.sha256(signature_string.encode()).hexdigest()[:16]
+    
     def reload_config(self) -> None:
         """重新加载配置文件"""
         logger.info("重新加载工具包配置...")
@@ -313,6 +332,42 @@ class ToolPackageManager:
         # 清理缓存
         self.tools_cache.clear()
         logger.info(f"已加载 {len(self.packages)} 个工具包")
+    
+    async def reload_config_and_tools(self) -> None:
+        """异步热重载配置和工具
+        
+        这个方法会：
+        1. 关闭并清理所有旧的 MCP 子进程
+        2. 重新加载配置文件
+        3. 重新解析工具包
+        4. 清理工具缓存，下次调用时会重新加载
+        5. 清理Agent缓存，强制重新编译Agent
+        """
+        logger.info("开始热重载工具配置和工具...")
+        
+        try:
+            # 1. 先清理所有旧的适配器和子进程
+            await self.cleanup()
+            
+            # 2. 重新加载配置文件
+            self.config = self._load_config()
+            
+            # 3. 重新解析工具包
+            self.packages = self._parse_packages()
+            
+            # 4. 清理Agent缓存（需要导入agent_factory）
+            try:
+                from ..factories.agent_factory import reset_agent_cache
+                await reset_agent_cache()
+                logger.info("Agent缓存已清理")
+            except Exception as e:
+                logger.warning(f"清理Agent缓存时出错: {e}")
+            
+            logger.info(f"热重载完成，已加载 {len(self.packages)} 个工具包")
+            
+        except Exception as e:
+            logger.error(f"热重载失败: {e}")
+            raise
 
 
 # 全局工具包管理器实例
