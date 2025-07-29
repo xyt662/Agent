@@ -56,13 +56,16 @@ class VectorDBRetriever:
             if not vector_store_dir.exists():
                 raise FileNotFoundError(
                     f"向量数据库目录不存在: {vector_store_dir}\n"
-                    "请先运行 scripts/build_vectorstore.py 构建向量数据库"
+                    "请先运行 tools/scripts/build_vectorstore.py 构建向量数据库"
                 )
             
             # 获取嵌入模型
             embeddings = get_embedding_model()
             
             # 连接到现有的ChromaDB
+            # collection_name：集合名称，用于存储和检索文档
+            # embedding_function：嵌入模型，用于将文档转换为向量
+            # persist_directory：持久化目录，用于存储向量数据库
             self.vectorstore = Chroma(
                 collection_name=collection_name,
                 embedding_function=embeddings,

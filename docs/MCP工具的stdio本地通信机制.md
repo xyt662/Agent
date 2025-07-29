@@ -189,4 +189,10 @@ $ npx -y @baidumap/mcp-server-baidu-map
 - **Node.js包**：node_modules或全局安装目录
 
 这种设计让我们的Agent能够**无缝集成**各种工具，而无需关心具体的网络配置、服务器部署等复杂问题！🚀
-        
+
+本地MCP服务器存储地址
+Tavily MCP服务器
+/Users/xyt/.npm/_npx/941b6692ba05c9b2/node_modules/tavily-mcp/
+
+百度地图MCP服务器
+/Users/xyt/.npm/_npx/941b6692ba05c9b2/node_modules/@baidumap/mcp-server-baidu-map/
