@@ -28,7 +28,7 @@ class VectorDBRetriever:
     职责：
     - 初始化和管理 ChromaDB 连接
     - 提供基础的相似性检索功能
-    - 支持不同的检索策略（similarity, mmr, threshold）
+    - 支持不同的检索策略(similarity, mmr, threshold)
     """
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):

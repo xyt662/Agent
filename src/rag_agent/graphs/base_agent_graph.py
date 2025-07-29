@@ -7,8 +7,8 @@ from langchain_core.tools import BaseTool
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
-from rag_agent.core.agent_state import AgentState
-from rag_agent.nodes.agent_node import agent_node
+from ..core.agent_state import AgentState
+from ..nodes.agent_node import agent_node
 
 logger = logging.getLogger(__name__)
 

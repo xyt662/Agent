@@ -38,7 +38,6 @@ if __name__ == "__main__":
             
             print("=== 测试1: RAG知识库查询 ===")
             # 使用一个需要背景知识的问题来测试RAG功能
-            """
             inputs = {"messages": [HumanMessage(content="LangGraph的核心优势是什么？请详细介绍一下。")]}
             
             try:
@@ -52,7 +51,7 @@ if __name__ == "__main__":
                 logger.error(f"Agent执行失败: {e}", exc_info=True)
             
             print("\n=== 测试2: MCP工具测试 ===")
-            """
+    
             # 测试MCP工具
             mcp_inputs = {"messages": [HumanMessage(content="请你使用百度mcp工具搜索杭州的经纬度")]}
             
