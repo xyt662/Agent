@@ -29,7 +29,7 @@ def get_embedding_model() -> Any:
     Raises:
         ValueError: 如果没有配置有效的API密钥
     """
-    # 优先使用DashScope（阿里云）嵌入模型，如果没有则使用OpenAI
+    # 优先使用DashScope(阿里云)嵌入模型，如果没有则使用OpenAI
     dashscope_api_key = os.getenv("DASHSCOPE_API_KEY")
     openai_api_key = os.getenv("OPENAI_API_KEY")
     
