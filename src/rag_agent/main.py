@@ -239,6 +239,55 @@ def list_sessions():
         "sessions": sessions
     }
 
+@app.post("/chat/complete")
+async def chat_complete(request: ChatRequest) -> ChatResponse:
+    """
+    非流式聊天端点 - 返回完整的JSON响应
+    
+    Args:
+        request: 包含 session_id 和 query 的聊天请求
+    
+    Returns:
+        ChatResponse: 包含完整回答的JSON响应
+    """
+    try:
+        # 1. 获取 Agent 实例
+        app_runnable = await get_main_agent_runnable()
+        
+        # 2. 恢复或创建会话状态
+        session_id = request.session_id
+        current_state = SESSION_STATES.get(session_id, AgentState(messages=[]))
+        
+        # 3. 将新问题添加到状态中
+        current_state["messages"].append(HumanMessage(content=request.query))
+        
+        # 4. 执行 Agent 并等待完整结果
+        logger.info(f"开始处理会话 {session_id} 的查询: {request.query[:50]}...")
+        
+        # 使用 ainvoke 获取完整结果
+        result = await app_runnable.ainvoke(current_state)
+        
+        # 5. 提取最终回答
+        final_message = result["messages"][-1]
+        if hasattr(final_message, 'content'):
+            final_answer = final_message.content
+        else:
+            final_answer = str(final_message)
+        
+        # 6. 更新会话状态
+        SESSION_STATES[session_id] = result
+        
+        logger.info(f"会话 {session_id} 处理完成，回答长度: {len(final_answer)}")
+        
+        return ChatResponse(
+            response=final_answer,
+            session_id=session_id
+        )
+        
+    except Exception as e:
+        logger.error(f"非流式聊天端点出错: {e}")
+        raise HTTPException(status_code=500, detail=f"内部服务器错误: {str(e)}")
+
 @app.post("/tools/reload")
 async def reload_tools():
     """

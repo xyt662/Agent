@@ -52,7 +52,7 @@ class LocalCommandToolAdapter:
         基于官方教程的connect_to_server方法实现
         """
         try:
-            logger.info(f"Connecting to MCP server: {self.command} {' '.join(self.args)}")
+            logger.info(f"🚀 启动MCP服务器 | 命令: {self.command} | 参数: {' '.join(self.args)} | 通信协议: stdio")
             
             # 过滤掉None值的环境变量
             filtered_env = {k: v for k, v in (self.env or {}).items() if v is not None}
@@ -176,10 +176,11 @@ class LocalCommandToolAdapter:
                     # 过滤掉None值
                     filtered_kwargs = {k: v for k, v in kwargs.items() if v is not None}
                     
-                    logger.debug(f"Calling MCP tool {tool_name} with args: {filtered_kwargs}")
+                    logger.info(f"🔧 MCP工具调用 | 工具: {tool_name} | 参数: {filtered_kwargs} | 通信方式: stdio")
                     
                     # 调用MCP工具
                     result = await self.adapter_session.call_tool(tool_name, filtered_kwargs)
+                    logger.info(f"✅ MCP工具执行完成 | 工具: {tool_name} | 结果长度: {len(str(result)) if result else 0} 字符")
                     
                     # 处理结果
                     if hasattr(result, 'content'):
