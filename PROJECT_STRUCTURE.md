@@ -44,28 +44,25 @@ RAG-Agent-Project/
 │   ├── RAG_OPTIMIZATION_GUIDE.md      # RAG优化指南
 │   └── 多跳查询.md                    # 多跳查询设计文档
 │
-├── examples/                # 示例和演示脚本
-│   └── tool_manager_demo.py           # 工具管理器演示脚本
-│
 ├── tests/                   # 测试代码目录
 │   ├── __init__.py
-│   ├── test_baidu_api_key.py           # 百度地图API KEY验证测试
-│   ├── test_mcp_direct.py              # 直接MCP工具调用测试
-│   ├── test_baidu_map_tools.py         # 百度地图MCP工具测试
-│   ├── test_mcp_tools_simple.py        # 简单MCP工具测试
-│   ├── integration/         # 集成测试
+│   ├── test_api_client.py              # API客户端测试
+│   ├── test_both_endpoints.py          # 双端点测试
+│   ├── test_baidu_api_key.py           # 百度API密钥测试
+│   ├── test_baidu_map_tools.py         # 百度地图工具测试
+│   ├── test_mcp_direct.py              # MCP直接调用测试
+│   ├── test_mcp_tools_simple.py        # MCP工具简单测试
+│   ├── integration/                    # 集成测试
 │   │   ├── __init__.py
 │   │   └── test_tool_manager_integration.py
-│   └── unit/               # 单元测试
+│   └── unit/                           # 单元测试
 │       ├── __init__.py
 │       └── test_tool_manager.py
 │
-├── tools/                   # 工具脚本目录
+├── scripts/                 # 开发和构建脚本目录
 │   ├── __init__.py
-│   └── scripts/
-│       ├── __init__.py
-│       ├── build_vectorstore.py       # 向量数据库构建脚本
-│       └── visualize_graph.py         # 图结构可视化脚本
+│   ├── build_vectorstore.py           # 向量数据库构建脚本
+│   └── visualize_graph.py             # 图结构可视化脚本
 │
 └── src/                     # 所有应用源代码的主目录
     └── rag_agent/
