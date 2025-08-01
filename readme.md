@@ -6,11 +6,11 @@
 ![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-purple)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-SynapseAgent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化和可扩展的智能代理系统。它集成了 RAG（检索增强生成）技术和 MCP（模型上下文协议）工具生态，旨在作为一个健壮的框架，用于开发能够利用私有知识库和外部工具来智能回答问题的复杂代理。
+SynapseAgent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化和可扩展的智能代理系统。它集成了 RAG（检索增强生成）技术和 MCP（模型上下文协议）工具生态，旨在作为一个健壮的框架，用于开发能够利用私有知识库和外部工具来智能回答问题的复杂代理
 
-项目已成功实现**Cursor模式的MCP（Model Context Protocol）集成**，通过本地MCP服务器提供强大的工具调用能力，支持百度地图、Tavily搜索等多种工具包。
+项目已成功实现**Cursor模式的MCP（Model Context Protocol）集成**，通过本地MCP服务器提供强大的工具调用能力，支持百度地图、Tavily搜索等多种工具包
 
-这个项目的核心设计哲学是**关注点分离**和**依赖注入**，使得每个组件（如LLM、工具、图结构）都高度解耦，易于测试、替换和扩展。
+这个项目的核心设计哲学是**关注点分离**和**依赖注入**，使得每个组件（如LLM、工具、图结构）都高度解耦，易于测试、替换和扩展
 
 ## ✨ 项目特性
 
@@ -38,7 +38,7 @@ SynapseAgent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化
   ```
 
 - **安装依赖**:
-  建议使用虚拟环境（如 venv 或 conda）。
+  建议使用虚拟环境（如 venv 或 conda）
   ```bash
   python -m venv venv
   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
@@ -48,15 +48,15 @@ SynapseAgent 是一个基于 LangChain 和 LangGraph 构建的、高度模块化
 ### 2. 配置 API 密钥
 
 - **创建 `.env` 文件**:
-  项目根目录下有一个 `.env.example` 文件（如果还没有，请创建一个）。请将其复制并重命名为 `.env`。
+  项目根目录下有一个 `.env.example` 文件（如果还没有，请创建一个）。请将其复制并重命名为 `.env`
   ```bash
   cp .env.example .env
   ```
 
 - **编辑 `.env` 文件**:
-  打开 `.env` 文件，并填入您的大语言模型和MCP工具的 API 密钥。
+  打开 `.env` 文件，并填入您的大语言模型和MCP工具的 API 密钥
   ```bash
-  # 大语言模型 API (推荐使用 DeepSeek)
+  # 大语言模型 API 
   DEEPSEEK_API_KEY=your_deepseek_api_key_here
   
   # MCP工具API密钥
@@ -77,7 +77,7 @@ python scripts/build_vectorstore.py
 
 ### 4. 运行代理
 
-本项目提供了一个简单的命令行运行脚本，用于快速测试代理的MCP工具功能。
+本项目提供了一个简单的命令行运行脚本，用于快速测试代理的MCP工具功能
 
 ```bash
 # 在项目根目录下运行
@@ -161,17 +161,17 @@ SynapseAgent/
         }
       }
       ```
-  2.  在 `.env` 文件中添加相应的环境变量。
-  3.  工具会自动加载并集成到代理中。
+  2.  在 `.env` 文件中添加相应的环境变量
+  3.  工具会自动加载并集成到代理中
 
 - **添加传统工具**:
-  1.  在 `tools/` 目录下创建一个新工具函数，并用 `@tool` 装饰器标记。
-  2.  在 `tools/tool_registry.py` 的 `get_all_tools()` 函数中注册你的新工具。
-  3.  工厂会自动将新工具注入代理，无需修改其他代码。
+  1.  在 `tools/` 目录下创建一个新工具函数，并用 `@tool` 装饰器标记
+  2.  在 `tools/tool_registry.py` 的 `get_all_tools()` 函数中注册你的新工具
+  3.  工厂会自动将新工具注入代理，无需修改其他代码
 
 - **修改工作流**:
-  1.  打开 `graphs/base_agent_graph.py`。
-  2.  您可以添加新的节点（`add_node`）或修改现有的边（`add_conditional_edges`）来改变代理的行为。
+  1.  打开 `graphs/base_agent_graph.py`
+  2.  您可以添加新的节点（`add_node`）或修改现有的边（`add_conditional_edges`）来改变代理的行为
 
 - **运行测试**:
   ```bash
@@ -190,5 +190,5 @@ SynapseAgent/
 
 ## 许可
 
-本项目采用 [MIT 许可](LICENSE)。
+本项目采用 [MIT 许可](LICENSE)
 ```
