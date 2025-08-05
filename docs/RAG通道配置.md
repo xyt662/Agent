@@ -1,12 +1,12 @@
 # RAG 检索优化指南
 
-本文档详细介绍了项目中实现的 RAG（检索增强生成）优化技术，以及如何配置和使用这些功能来提升检索质量。
+本文档详细介绍了项目中实现的 RAG（检索增强生成）优化技术，以及如何配置和使用这些功能来提升检索质量
 
 ## 🎯 优化技术概览
 
 ### 1. 相似度阈值过滤 (Similarity Score Threshold)
 
-**原理**：设置最低相似度阈值，过滤掉质量较低的检索结果。
+**原理**：设置最低相似度阈值，过滤掉质量较低的检索结果
 
 **优势**：
 - 提高检索结果的相关性
@@ -21,7 +21,7 @@ RAG_SCORE_THRESHOLD=0.7  # 0-1之间，越高越严格
 
 ### 2. MMR 算法 (Maximal Marginal Relevance)
 
-**原理**：在保证相关性的同时，最大化结果的多样性，减少重复内容。
+**原理**：在保证相关性的同时，最大化结果的多样性，减少重复内容
 
 **优势**：
 - 减少检索结果的重复性
@@ -38,7 +38,7 @@ RAG_MMR_LAMBDA=0.5      # 多样性参数 (0-1，越小越多样)
 
 ### 3. 查询扩展 (Query Expansion)
 
-**原理**：通过添加同义词和相关术语来扩展原始查询，提高检索召回率。
+**原理**：通过添加同义词和相关术语来扩展原始查询，提高检索召回率
 
 **优势**：
 - 提高检索召回率
@@ -60,7 +60,7 @@ RAG_USE_QUERY_EXPANSION=true
 
 ### 4. 文档重排序 (Document Reranking)
 
-**原理**：基于查询与文档的语义相似度对检索结果进行重新排序。
+**原理**：基于查询与文档的语义相似度对检索结果进行重新排序
 
 **排序因子**：
 - 查询词匹配分数
@@ -121,52 +121,6 @@ RAG_MMR_LAMBDA=0.5             # MMR多样性参数 (默认: 0.5)
 - 需要全面信息的场景
 - 对准确性要求较高的应用
 
-## 🚀 使用示例
-
-### 代码示例
-
-```python
-from rag_agent.tools.knowledge_base import (
-    enhanced_similarity_search,
-    query_expansion,
-    rerank_documents
-)
-
-# 1. 使用增强相似性搜索
-documents = enhanced_similarity_search(
-    vectorstore=vectorstore,
-    query="LangGraph agent 架构",
-    k=5,
-    score_threshold=0.7,
-    use_mmr=True
-)
-
-# 2. 查询扩展
-expanded_queries = query_expansion("agent 工具")
-print(expanded_queries)
-# 输出: ['agent 工具', 'agent 工具 智能体', 'agent 工具 函数']
-
-# 3. 文档重排序
-reranked_docs = rerank_documents(
-    query="LangGraph 最佳实践",
-    documents=documents,
-    top_k=3
-)
-```
-
-### 配置切换示例
-
-```python
-# 创建高精度配置的知识库工具
-tool = KnowledgeBaseTool()
-tool.score_threshold = 0.8
-tool.use_mmr = True
-tool.use_query_expansion = True
-tool.use_reranking = True
-
-# 执行查询
-result = tool._run("如何优化 RAG 检索性能？")
-```
 
 ## 🔍 故障排除
 
@@ -184,18 +138,7 @@ A: 禁用部分优化功能，或减少 `RAG_MMR_FETCH_K` 值
 **Q: 检索结果不够相关**
 A: 提高 `RAG_SCORE_THRESHOLD` 值，启用重排序功能
 
-### 性能监控
 
-```python
-import time
-
-start_time = time.time()
-result = tool._run(query)
-end_time = time.time()
-
-print(f"检索耗时: {end_time - start_time:.2f}秒")
-print(f"结果数量: {len(result.split('[信息片段'))-1}")
-```
 
 ## 📈 未来优化方向
 
@@ -223,5 +166,3 @@ print(f"结果数量: {len(result.split('[信息片段'))-1}")
 - [RAG 优化最佳实践](https://arxiv.org/abs/2312.10997)
 
 ---
-
-**注意**：本指南中的所有优化技术都已在 `knowledge_base.py` 中实现，可以通过环境变量进行灵活配置。建议根据具体应用场景进行参数调优。

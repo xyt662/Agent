@@ -21,7 +21,7 @@ def get_deepseek_api_key():
 LLM_MODEL_NAME = "deepseek-v3"
 
 # 嵌入模型配置
-DASHSCOPE_EMBEDDING_MODEL_NAME = "text-embedding-v4"  # DashScope嵌入模型,Qwen3-Embedding
+DASHSCOPE_EMBEDDING_MODEL_NAME = "text-embedding-v1"  # DashScope嵌入模型,1024维向量
 OPENAI_EMBEDDING_MODEL_NAME = "text-embedding-ada-002"  # OpenAI默认嵌入模型
 
 
